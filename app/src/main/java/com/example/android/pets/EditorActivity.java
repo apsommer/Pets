@@ -1,9 +1,12 @@
 package com.example.android.pets;
 
+import android.content.ContentValues;
+import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 import android.support.v4.app.NavUtils;
 import android.support.v7.app.AppCompatActivity;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -11,8 +14,10 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.Spinner;
+import android.widget.Toast;
 
 import com.example.android.pets.data.PetContract.PetEntry;
+import com.example.android.pets.data.PetDbHelper;
 
 /**
  * Allows user to create a new pet or edit an existing one.
@@ -90,6 +95,51 @@ public class EditorActivity extends AppCompatActivity {
         });
     }
 
+    private void insertPet() {
+
+        // get user selections
+        String nameString = mNameEditText.getText().toString().trim();
+        String breedString = mBreedEditText.getText().toString().trim();
+        // gender is already an int, assigned in the spinner listener
+        int weightInt = Integer.parseInt(mWeightEditText.getText().toString().trim());
+
+        // container for key : value pairs
+        ContentValues values = new ContentValues();
+
+        // add key : value pairs for each feature
+        values.put(PetEntry.COLUMN_PETS_NAME, nameString);
+        values.put(PetEntry.COLUMN_PETS_BREED, breedString);
+        values.put(PetEntry.COLUMN_PETS_GENDER, mGender);
+        values.put(PetEntry.COLUMN_PETS_WEIGHT, weightInt);
+
+        // value assigned to mDbHelper in onCreate using "new" keyword
+        // since mDbHelper is declared a global variable, the object that it points to is not destroyed
+        // at the conclusion of onCreate, the mDbHelper continues to reference this object in subsquent methods
+        // and all methods are subsequent to onCreate
+
+        // To access our database, we instantiate our subclass of SQLiteOpenHelper
+        // and pass the context, which is the current activity.
+        PetDbHelper mDbHelper = new PetDbHelper(this);
+        SQLiteDatabase db = mDbHelper.getWritableDatabase();
+
+        // returns row ID integer if successful, -1 for error
+        long newRowId = db.insert(PetEntry.TABLE_NAME, null, values);
+        Log.e("CatalogActivity", "Row ID: " + newRowId);
+
+        // toast message about status of row insert
+        String toastMessage;
+        if (newRowId > 0) { // row insert successful
+            toastMessage = "Pet saved with id: " + newRowId;
+        }
+        else { // row insert failed
+            toastMessage = "Error with saving pet.";
+        }
+
+        Toast toast = Toast.makeText(getApplicationContext(), toastMessage, Toast.LENGTH_SHORT);
+        toast.show();
+
+    }
+
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu options from the res/menu/menu_editor.xml file.
@@ -100,22 +150,34 @@ public class EditorActivity extends AppCompatActivity {
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
+
         // User clicked on a menu option in the app bar overflow menu
         switch (item.getItemId()) {
+
             // Respond to a click on the "Save" menu option
             case R.id.action_save:
-                // Do nothing for now
+
+                // insert new pet into sqlite database
+                insertPet();
+
+                // exit activity and return to catalog activity
+                finish();
                 return true;
+
             // Respond to a click on the "Delete" menu option
             case R.id.action_delete:
+
                 // Do nothing for now
                 return true;
+
             // Respond to a click on the "Up" arrow button in the app bar
             case android.R.id.home:
+
                 // Navigate back to parent activity (CatalogActivity)
                 NavUtils.navigateUpFromSameTask(this);
                 return true;
         }
+
         return super.onOptionsItemSelected(item);
     }
 }

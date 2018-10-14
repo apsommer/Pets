@@ -12,6 +12,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.example.android.pets.data.PetDbHelper;
 import com.example.android.pets.data.PetContract.PetEntry;
@@ -38,7 +39,6 @@ public class CatalogActivity extends AppCompatActivity {
             }
         });
 
-        mDbHelper = new PetDbHelper(this);
         displayDatabaseInfo();
 
     }
@@ -50,7 +50,7 @@ public class CatalogActivity extends AppCompatActivity {
     private void displayDatabaseInfo() {
         // To access our database, we instantiate our subclass of SQLiteOpenHelper
         // and pass the context, which is the current activity.
-        //mDbHelper = new PetDbHelper(this);
+        mDbHelper = new PetDbHelper(this);
 
         // Create and/or open a database to read from it
         SQLiteDatabase db = mDbHelper.getReadableDatabase();
@@ -82,10 +82,21 @@ public class CatalogActivity extends AppCompatActivity {
         values.put(PetEntry.COLUMN_PETS_GENDER, PetEntry.GENDER_MALE);
         values.put(PetEntry.COLUMN_PETS_WEIGHT, 7);
 
+        // value assigned to mDbHelper in onCreate using "new" keyword
+        // since mDbHelper is declared a global variable, the object that it points to is not destroyed
+        // at the conclusion of onCreate, the mDbHelper continues to reference this object in subsequent methods
+        // and all methods are subsequent to onCreate
         SQLiteDatabase db = mDbHelper.getWritableDatabase();
         long newRowId = db.insert(PetEntry.TABLE_NAME, null, values);
         Log.e("CatalogActivity", "Row ID: " + newRowId);
 
+    }
+
+    // called when returning to this activity from editor activity
+    @Override
+    protected void onStart() {
+        super.onStart();
+        displayDatabaseInfo();
     }
 
     @Override
