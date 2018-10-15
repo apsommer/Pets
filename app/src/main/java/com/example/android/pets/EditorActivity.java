@@ -112,11 +112,6 @@ public class EditorActivity extends AppCompatActivity {
         values.put(PetEntry.COLUMN_PETS_GENDER, mGender);
         values.put(PetEntry.COLUMN_PETS_WEIGHT, weightInt);
 
-        // value assigned to mDbHelper in onCreate using "new" keyword
-        // since mDbHelper is declared a global variable, the object that it points to is not destroyed
-        // at the conclusion of onCreate, the mDbHelper continues to reference this object in subsquent methods
-        // and all methods are subsequent to onCreate
-
         // To access our database, we instantiate our subclass of SQLiteOpenHelper
         // and pass the context, which is the current activity.
         PetDbHelper mDbHelper = new PetDbHelper(this);
@@ -135,6 +130,7 @@ public class EditorActivity extends AppCompatActivity {
             toastMessage = "Error with saving pet.";
         }
 
+        // display toast
         Toast toast = Toast.makeText(getApplicationContext(), toastMessage, Toast.LENGTH_SHORT);
         toast.show();
 

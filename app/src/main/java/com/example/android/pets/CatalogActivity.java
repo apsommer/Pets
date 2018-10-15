@@ -12,7 +12,6 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.example.android.pets.data.PetDbHelper;
 import com.example.android.pets.data.PetContract.PetEntry;
@@ -43,6 +42,13 @@ public class CatalogActivity extends AppCompatActivity {
 
     }
 
+    // called when returning to this activity from editor activity
+    @Override
+    protected void onStart() {
+        super.onStart();
+        displayDatabaseInfo();
+    }
+
     /**
      * Temporary helper method to display information in the onscreen TextView about the state of
      * the pets database.
@@ -55,9 +61,12 @@ public class CatalogActivity extends AppCompatActivity {
         // Create and/or open a database to read from it
         SQLiteDatabase db = mDbHelper.getReadableDatabase();
 
-        // Perform this raw SQL query "SELECT * FROM pets"
-        // to get a Cursor that contains all rows from the pets table.
-        Cursor cursor = db.rawQuery("SELECT * FROM " + PetEntry.TABLE_NAME, null);
+        // query the pets table
+        // return all columns and all rows
+        // equivilent to SQL clause: SELECT * FROM pets;
+        Cursor cursor = db.query(PetEntry.TABLE_NAME,
+                null, null, null, null, null, null, null);
+
         try {
             // Display the number of rows in the Cursor (which reflects the number of rows in the
             // pets table in the database).
@@ -90,13 +99,6 @@ public class CatalogActivity extends AppCompatActivity {
         long newRowId = db.insert(PetEntry.TABLE_NAME, null, values);
         Log.e("CatalogActivity", "Row ID: " + newRowId);
 
-    }
-
-    // called when returning to this activity from editor activity
-    @Override
-    protected void onStart() {
-        super.onStart();
-        displayDatabaseInfo();
     }
 
     @Override
