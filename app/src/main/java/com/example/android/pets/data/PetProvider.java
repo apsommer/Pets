@@ -2,6 +2,7 @@ package com.example.android.pets.data;
 
 import android.content.ContentProvider;
 import android.content.ContentValues;
+import android.content.UriMatcher;
 import android.database.Cursor;
 import android.net.Uri;
 
@@ -14,6 +15,29 @@ public class PetProvider extends ContentProvider {
     // database helper object
     private PetDbHelper mDbHelper;
 
+    // codes for URI matcher in the pets table
+    private static final int PETS = 100;
+    private static final int PET_ID = 101;
+
+    // UriMatcher object matches a content URI to an integer code
+    // the input passed to the constructor represents the code to return for the root URI
+    // it is common to use the framework NO_MATCH constant for this initial case
+    private static final UriMatcher mUriMatcher = new UriMatcher(UriMatcher.NO_MATCH);
+
+    // static initializer is run the first time anything is called from this class
+    static {
+
+        // The calls to addURI() go here, for all of the content URI patterns that the provider
+        // should recognize. All paths added to the UriMatcher have a corresponding code to return
+        // when a match is found.
+
+        // recognize these content URI patterns and return the specified integer codes
+        // first line assigns code 100 to "content://com.example.android.pets/pets"
+        mUriMatcher.addURI(PetContract.CONTENT_AUTHORITY, PetContract.PATH_PETS, PETS);
+        mUriMatcher.addURI(PetContract.CONTENT_AUTHORITY, PetContract.PATH_PETS + "/#", PET_ID);
+
+    }
+
     // initialize provider and database helper
     @Override
     public boolean onCreate() {
@@ -23,7 +47,6 @@ public class PetProvider extends ContentProvider {
 
         return true;
     }
-
 
     // perform a query on the given URI
     @Override

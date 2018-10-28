@@ -15,6 +15,8 @@ public class PetDbHelper extends SQLiteOpenHelper {
 
     // defer to superclass constructor
     public PetDbHelper(Context context) {
+
+        // this constructor calls onCreate only if the database does not already exist on the device
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
     }
 
