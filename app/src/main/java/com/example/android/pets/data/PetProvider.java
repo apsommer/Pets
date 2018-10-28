@@ -1,10 +1,14 @@
 package com.example.android.pets.data;
 
 import android.content.ContentProvider;
+import android.content.ContentUris;
 import android.content.ContentValues;
 import android.content.UriMatcher;
 import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
 import android.net.Uri;
+
+import com.example.android.pets.data.PetContract.PetEntry;
 
 // content provider
 public class PetProvider extends ContentProvider {
@@ -27,10 +31,6 @@ public class PetProvider extends ContentProvider {
     // static initializer is run the first time anything is called from this class
     static {
 
-        // The calls to addURI() go here, for all of the content URI patterns that the provider
-        // should recognize. All paths added to the UriMatcher have a corresponding code to return
-        // when a match is found.
-
         // recognize these content URI patterns and return the specified integer codes
         // first line assigns code 100 to "content://com.example.android.pets/pets"
         mUriMatcher.addURI(PetContract.CONTENT_AUTHORITY, PetContract.PATH_PETS, PETS);
@@ -51,7 +51,47 @@ public class PetProvider extends ContentProvider {
     // perform a query on the given URI
     @Override
     public Cursor query(Uri uri, String[] projection, String selection, String[] selectionArgs, String sortOrder) {
-        return null;
+
+        // get reference to readable database
+        SQLiteDatabase database = mDbHelper.getReadableDatabase();
+
+        // cursor holds the result of the query
+        Cursor cursor;
+
+        // get pattern match code for URI
+        int match = mUriMatcher.match(uri);
+
+        switch (match) {
+
+            case PETS:
+
+                // perform a query on the entire pets table
+                cursor = database.query(PetEntry.TABLE_NAME, projection, selection, selectionArgs,
+                        null, null, sortOrder);
+                break;
+
+            case PET_ID:
+
+                // the ? and array pattern protects against SQL injection hacker attacks
+                // number of ? in selection must match number of elements in selectionArgs[]
+                // equivalent to string "_id=?"
+                selection = PetEntry._ID + "=?";
+
+                // parseId extracts only the integer id from the content URI
+                // equivalent to string "_id=#" where # is any integer
+                selectionArgs = new String[] {String.valueOf(ContentUris.parseId(uri))};
+
+                // perform a query on the pets table where _id equals #, returning a single row Cursor
+                cursor = database.query(PetEntry.TABLE_NAME, projection, selection, selectionArgs,
+                        null, null, sortOrder);
+
+                break;
+
+            default:
+                throw new IllegalArgumentException("Cannot query unknown URI: " + uri);
+        }
+
+        return cursor;
     }
 
     // get MIMI data type at the content URI

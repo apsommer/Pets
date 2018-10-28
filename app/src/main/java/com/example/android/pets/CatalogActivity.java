@@ -16,9 +16,7 @@ import android.widget.TextView;
 import com.example.android.pets.data.PetDbHelper;
 import com.example.android.pets.data.PetContract.PetEntry;
 
-/**
- * Displays list of pets that were entered and stored in the app.
- */
+// displays list of pets that were entered and stored in the app
 public class CatalogActivity extends AppCompatActivity {
 
     private PetDbHelper mDbHelper;
@@ -28,7 +26,7 @@ public class CatalogActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_catalog);
 
-        // Setup FAB to open EditorActivity
+        // setup FAB to open EditorActivity
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -49,25 +47,16 @@ public class CatalogActivity extends AppCompatActivity {
         displayDatabaseInfo();
     }
 
-    /**
-     * Temporary helper method to display information in the onscreen TextView about the state of
-     * the pets database.
-     */
+    // temporary helper method to display information in the onscreen TextView about the state of the pets database
     private void displayDatabaseInfo() {
-        // To access our database, we instantiate our subclass of SQLiteOpenHelper
-        // and pass the context, which is the current activity.
-        mDbHelper = new PetDbHelper(this);
-
-        // Create and/or open a database to read from it
-        SQLiteDatabase db = mDbHelper.getReadableDatabase();
 
         // define projection (column names) for query
         String[] projection = {PetEntry._ID, PetEntry.COLUMN_PETS_NAME,
                 PetEntry.COLUMN_PETS_BREED, PetEntry.COLUMN_PETS_GENDER, PetEntry.COLUMN_PETS_WEIGHT};
 
-        // query the pets table, this line is equivalent to SQL clause "SELECT _ID, name, breed, gender FROM pets;"
-        Cursor cursor = db.query(PetEntry.TABLE_NAME, projection,
-                null, null, null, null, null, null);
+        // perform a query on the provider using a content resolver
+        // the correct content URI is defined as a constant in PetContract
+        Cursor cursor = getContentResolver().query(PetEntry.CONTENT_URI, projection, null, null, null);
 
         // get reference to TextView in activity_catalog
         TextView displayView = (TextView) findViewById(R.id.text_view_pet);
