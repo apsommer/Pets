@@ -135,7 +135,12 @@ public class PetProvider extends ContentProvider {
 
         // insert new row into the pets table and get the new row id
         long newRowId = database.insert(PetEntry.TABLE_NAME, null, values);
-        Log.e("PetProvider", "Row ID: " + newRowId);
+
+        // if the insertion failed then newRowId = -1 and return null
+        if (newRowId == -1) {
+            Log.e(LOG_TAG, "Insertion failed for: " + uri);
+            return null;
+        }
 
         // return the new URI with the new ID appended to it
         return ContentUris.withAppendedId(uri, newRowId);

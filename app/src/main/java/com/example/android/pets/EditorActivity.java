@@ -1,8 +1,6 @@
 package com.example.android.pets;
 
-import android.content.ContentUris;
 import android.content.ContentValues;
-import android.database.sqlite.SQLiteDatabase;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.NavUtils;
@@ -19,29 +17,23 @@ import android.widget.Spinner;
 import android.widget.Toast;
 
 import com.example.android.pets.data.PetContract.PetEntry;
-import com.example.android.pets.data.PetDbHelper;
 
-/**
- * Allows user to create a new pet or edit an existing one.
- */
+// user creates a new pet or edits an existing one
 public class EditorActivity extends AppCompatActivity {
 
-    /** EditText field to enter the pet's name */
+    // field to enter the pet's name
     private EditText mNameEditText;
 
-    /** EditText field to enter the pet's breed */
+    // field to enter the pet's breed
     private EditText mBreedEditText;
 
-    /** EditText field to enter the pet's weight */
+    // field to enter the pet's weight
     private EditText mWeightEditText;
 
-    /** EditText field to enter the pet's gender */
+    // field to enter the pet's gender
     private Spinner mGenderSpinner;
 
-    /**
-     * Gender of the pet. The possible values are:
-     * 0 for unknown gender, 1 for male, 2 for female.
-     */
+    // gender of the pet: 0 for unknown gender, 1 for male, 2 for female
     private int mGender = 0;
 
     @Override
@@ -62,18 +54,18 @@ public class EditorActivity extends AppCompatActivity {
      * Setup the dropdown spinner that allows the user to select the gender of the pet.
      */
     private void setupSpinner() {
-        // Create adapter for spinner. The list options are from the String array it will use
-        // the spinner will use the default layout
+
+        // create adapter for spinner, options from string array, default layout
         ArrayAdapter genderSpinnerAdapter = ArrayAdapter.createFromResource(this,
                 R.array.array_gender_options, android.R.layout.simple_spinner_item);
 
-        // Specify dropdown layout style - simple list view with 1 item per line
+        // specify dropdown layout style as simple list view with 1 item per line
         genderSpinnerAdapter.setDropDownViewResource(android.R.layout.simple_dropdown_item_1line);
 
-        // Apply the adapter to the spinner
+        // set adapter on the spinner
         mGenderSpinner.setAdapter(genderSpinnerAdapter);
 
-        // Set the integer mSelected to the constant values
+        // set mGender to the user selected constant value
         mGenderSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
@@ -89,10 +81,10 @@ public class EditorActivity extends AppCompatActivity {
                 }
             }
 
-            // Because AdapterView is an abstract class, onNothingSelected must be defined
+            // default state must be defined
             @Override
             public void onNothingSelected(AdapterView<?> parent) {
-                mGender = 0; // Unknown
+                mGender = 0; // gender unknown
             }
         });
     }
@@ -118,16 +110,13 @@ public class EditorActivity extends AppCompatActivity {
         // the correct content URI is defined as a constant in PetContract
         Uri uri = getContentResolver().insert(PetEntry.CONTENT_URI, values);
 
-        // get new row id, parseId extracts only the integer id from the content URI
-        long newRowId = ContentUris.parseId(uri);
-
         // toast message about status of row insert
         String toastMessage;
-        if (newRowId > 0) { // row insert successful
-            toastMessage = getString(R.string.pet_saved);
-        }
-        else { // row insert failed
+        if (uri == null) { // row insert failed and therefore returned insert uri is null
             toastMessage = getString(R.string.pet_saved_error);
+        }
+        else { // row insert successful
+            toastMessage = getString(R.string.pet_saved);
         }
 
         // display toast
