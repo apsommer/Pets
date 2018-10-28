@@ -1,7 +1,9 @@
 package com.example.android.pets;
 
+import android.content.ContentUris;
 import android.content.ContentValues;
 import android.database.sqlite.SQLiteDatabase;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.NavUtils;
 import android.support.v7.app.AppCompatActivity;
@@ -112,22 +114,20 @@ public class EditorActivity extends AppCompatActivity {
         values.put(PetEntry.COLUMN_PETS_GENDER, mGender);
         values.put(PetEntry.COLUMN_PETS_WEIGHT, weightInt);
 
-        // To access our database, we instantiate our subclass of SQLiteOpenHelper
-        // and pass the context, which is the current activity.
-        PetDbHelper mDbHelper = new PetDbHelper(this);
-        SQLiteDatabase db = mDbHelper.getWritableDatabase();
+        // perform an insert on the provider using a content resolver
+        // the correct content URI is defined as a constant in PetContract
+        Uri uri = getContentResolver().insert(PetEntry.CONTENT_URI, values);
 
-        // returns row ID integer if successful, -1 for error
-        long newRowId = db.insert(PetEntry.TABLE_NAME, null, values);
-        Log.e("CatalogActivity", "Row ID: " + newRowId);
+        // get new row id, parseId extracts only the integer id from the content URI
+        long newRowId = ContentUris.parseId(uri);
 
         // toast message about status of row insert
         String toastMessage;
         if (newRowId > 0) { // row insert successful
-            toastMessage = "Pet saved with id: " + newRowId;
+            toastMessage = getString(R.string.pet_saved);
         }
         else { // row insert failed
-            toastMessage = "Error with saving pet.";
+            toastMessage = getString(R.string.pet_saved_error);
         }
 
         // display toast

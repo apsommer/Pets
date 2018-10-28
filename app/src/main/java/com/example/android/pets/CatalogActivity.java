@@ -4,6 +4,7 @@ import android.content.ContentValues;
 import android.content.Intent;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AppCompatActivity;
@@ -111,13 +112,9 @@ public class CatalogActivity extends AppCompatActivity {
         values.put(PetEntry.COLUMN_PETS_GENDER, PetEntry.GENDER_MALE);
         values.put(PetEntry.COLUMN_PETS_WEIGHT, 7);
 
-        // value assigned to mDbHelper in onCreate using "new" keyword
-        // since mDbHelper is declared a global variable, the object that it points to is not destroyed
-        // at the conclusion of onCreate, the mDbHelper continues to reference this object in subsequent methods
-        // and all methods are subsequent to onCreate
-        SQLiteDatabase db = mDbHelper.getWritableDatabase();
-        long newRowId = db.insert(PetEntry.TABLE_NAME, null, values);
-        Log.e("CatalogActivity", "Row ID: " + newRowId);
+        // perform an insert on the provider using a content resolver
+        // the correct content URI is defined as a constant in PetContract
+        Uri uri = getContentResolver().insert(PetEntry.CONTENT_URI, values);
 
     }
 

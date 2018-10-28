@@ -7,6 +7,7 @@ import android.content.UriMatcher;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.net.Uri;
+import android.util.Log;
 
 import com.example.android.pets.data.PetContract.PetEntry;
 
@@ -63,6 +64,7 @@ public class PetProvider extends ContentProvider {
 
         switch (match) {
 
+            // full pets table
             case PETS:
 
                 // perform a query on the entire pets table
@@ -70,6 +72,7 @@ public class PetProvider extends ContentProvider {
                         null, null, sortOrder);
                 break;
 
+            // specific row in pets table
             case PET_ID:
 
                 // the ? and array pattern protects against SQL injection hacker attacks
@@ -103,7 +106,39 @@ public class PetProvider extends ContentProvider {
     // insert new data into provider
     @Override
     public Uri insert(Uri uri, ContentValues contentValues) {
-        return null;
+
+        // get pattern match code for URI
+        final int match = mUriMatcher.match(uri);
+
+        switch (match) {
+
+            // full pets table
+            case PETS:
+
+                // helper method returns content URI for this new row
+                return insertPet(uri, contentValues);
+
+            // specific row in pets table
+            // case PET_ID: this case will never happen as insert is always at the end of the table
+
+            // only the full table case is matches, everything else throws exception
+            default:
+                throw new IllegalArgumentException("Cannot query unknown URI: " + uri);
+        }
+    }
+
+    // insert pet into database with given content values, return content URI for this new row
+    private Uri insertPet(Uri uri, ContentValues values) {
+
+        // get reference to readable database
+        SQLiteDatabase database = mDbHelper.getWritableDatabase();
+
+        // insert new row into the pets table and get the new row id
+        long newRowId = database.insert(PetEntry.TABLE_NAME, null, values);
+        Log.e("PetProvider", "Row ID: " + newRowId);
+
+        // return the new URI with the new ID appended to it
+        return ContentUris.withAppendedId(uri, newRowId);
     }
 
     // delete data at the given selection
