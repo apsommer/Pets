@@ -97,12 +97,6 @@ public class PetProvider extends ContentProvider {
         return cursor;
     }
 
-    // get MIMI data type at the content URI
-    @Override
-    public String getType(Uri uri) {
-        return null;
-    }
-
     // insert new data into provider
     @Override
     public Uri insert(Uri uri, ContentValues contentValues) {
@@ -289,6 +283,29 @@ public class PetProvider extends ContentProvider {
             default:
                 throw new IllegalArgumentException("Deletion is not supported for " + uri);
         }
+    }
+
+    // get MIMI data type at the content URI
+    @Override
+    public String getType(Uri uri) {
+
+        // get pattern match code for URI
+        final int match = mUriMatcher.match(uri);
+
+        switch (match) {
+
+            // full pets table
+            case PETS:
+                return PetEntry.CONTENT_LIST_TYPE;
+
+            // specific row in pets table
+            case PET_ID:
+                return PetEntry.CONTENT_ITEM_TYPE;
+
+            default:
+                throw new IllegalArgumentException("Unknown URI: " + uri + " with match = " + match);
+        }
+
     }
 
 }

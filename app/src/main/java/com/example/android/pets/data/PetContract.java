@@ -1,5 +1,6 @@
 package com.example.android.pets.data;
 
+import android.content.ContentResolver;
 import android.net.Uri;
 import android.provider.BaseColumns;
 
@@ -36,9 +37,6 @@ public final class PetContract {
         public static final int GENDER_MALE = 1;
         public static final int GENDER_FEMALE = 2;
 
-        // content provider
-        public static final Uri CONTENT_URI = Uri.withAppendedPath(BASE_CONTENT_URI, PATH_PETS);
-
         // returns true if the gender is either 0, 1, or 2
         public static boolean isValidGender(int gender) {
             if (gender == GENDER_UNKNOWN || gender == GENDER_MALE || gender == GENDER_FEMALE) {
@@ -46,6 +44,19 @@ public final class PetContract {
             }
             return false;
         }
+
+        // content URI for the pets table
+        public static final Uri CONTENT_URI = Uri.withAppendedPath(BASE_CONTENT_URI, PATH_PETS);
+
+        // MIME type for a list of pets
+        // equivalent to "vnd.android.cursor.dir/com.example.android.pets/pets"
+        public static final String CONTENT_LIST_TYPE = ContentResolver.CURSOR_DIR_BASE_TYPE +
+                "/" + CONTENT_AUTHORITY + "/" + PATH_PETS;
+
+        // MIME type for a single pet
+        // equivalent to "vnd.android.cursor.item/com.example.android.pets/pets"
+        public static final String CONTENT_ITEM_TYPE = ContentResolver.CURSOR_ITEM_BASE_TYPE +
+                "/" + CONTENT_AUTHORITY + "/" + PATH_PETS;
 
     }
 
