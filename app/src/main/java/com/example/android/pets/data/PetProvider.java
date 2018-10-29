@@ -130,6 +130,29 @@ public class PetProvider extends ContentProvider {
     // insert pet into database with given content values, return content URI for this new row
     private Uri insertPet(Uri uri, ContentValues values) {
 
+        // check validity of name value
+        // extract the value from the key : value pair
+        String name = values.getAsString(PetEntry.COLUMN_PETS_NAME);
+        if (name == null) {
+            throw new IllegalArgumentException("Pet requires a name!");
+        }
+
+        // the breed value can be null, no need to check
+
+        // check validity of gender value
+        // use a capital Integer rather than int since we are checking for nullity
+        Integer gender = values.getAsInteger(PetEntry.COLUMN_PETS_GENDER);
+        if (gender == null || !PetEntry.isValidGender(gender)) {
+            throw new IllegalArgumentException("Pet requires a valid gender!");
+        }
+
+        // check validity of weight value
+        // use a capital Integer rather than int since we are checking for nullity
+        Integer weight = values.getAsInteger(PetEntry.COLUMN_PETS_WEIGHT);
+        if (weight != null && weight < 0) { // null is acceptable as the sqlite database will default to 0
+            throw new IllegalArgumentException("Pet requires a valid weight!");
+        }
+
         // get reference to readable database
         SQLiteDatabase database = mDbHelper.getWritableDatabase();
 
