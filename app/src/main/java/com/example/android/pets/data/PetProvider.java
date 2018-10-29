@@ -184,6 +184,7 @@ public class PetProvider extends ContentProvider {
                 // helper method returns integer for number of rows updated
                 return updatePet(uri, contentValues, selection, selectionArgs);
 
+            // specific row in pets table
             case PET_ID:
 
                 // the ? and array pattern protects against SQL injection hacker attacks
@@ -255,7 +256,39 @@ public class PetProvider extends ContentProvider {
     // delete data at the given selection
     @Override
     public int delete(Uri uri, String selection, String[] selectionArgs) {
-        return 0;
+
+        // get reference to writable database
+        SQLiteDatabase database = mDbHelper.getWritableDatabase();
+
+        // get pattern match code for URI
+        final int match = mUriMatcher.match(uri);
+
+        switch (match) {
+
+            // full pets table
+            case PETS:
+
+                // delete all rows at the selection and selection arguments
+                return database.delete(PetEntry.TABLE_NAME, selection, selectionArgs);
+
+            // specific row in pets table
+            case PET_ID:
+
+                // the ? and array pattern protects against SQL injection hacker attacks
+                // number of ? in selection must match number of elements in selectionArgs[]
+                // equivalent to string "_id=?"
+                selection = PetEntry._ID + "=?";
+
+                // parseId extracts only the integer id from the content URI
+                // equivalent to string "_id=#" where # is any integer
+                selectionArgs = new String[] {String.valueOf(ContentUris.parseId(uri))};
+
+                // delete a single row given by the ID in the URI
+                return database.delete(PetEntry.TABLE_NAME, selection, selectionArgs);
+
+            default:
+                throw new IllegalArgumentException("Deletion is not supported for " + uri);
+        }
     }
 
 }
