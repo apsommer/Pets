@@ -62,13 +62,7 @@ public class CatalogActivity extends AppCompatActivity implements LoaderManager.
         listView.setEmptyView(emptyView);
 
     }
-
-    // called when returning to this activity from editor activity
-    @Override
-    protected void onStart() {
-        super.onStart();
-    }
-
+    
     // insert dummy data for a single pet (new row in sqlite table)
     private void insertPet() {
 
