@@ -80,7 +80,7 @@ public class CatalogActivity extends AppCompatActivity implements LoaderManager.
                 // explicit intent to open editor activity
                 Intent intent = new Intent(CatalogActivity.this, EditorActivity.class);
 
-                // add content URI for the selected pet to the intent
+                // include the content URI for the selected pet with the intent
                 Uri selectedPetURI = ContentUris.withAppendedId(PetEntry.CONTENT_URI, id);
                 intent.setData(selectedPetURI);
 
@@ -90,7 +90,6 @@ public class CatalogActivity extends AppCompatActivity implements LoaderManager.
             }
 
         });
-
 
     }
 

@@ -50,20 +50,21 @@ public class EditorActivity extends AppCompatActivity {
         Intent intent = getIntent();
 
         // extract the URI included with the intent
-        Uri uri = intent.getData();
+        Uri selectedPetURI = intent.getData();
 
         // if the URI exists then the activity is in "edit mode" for a single pet
-        if (uri != null) {
+        if (selectedPetURI != null) {
 
             // change action bar title to reflect "edit mode"
-            setTitle("Edit pet");
+            setTitle(R.string.editor_activity_title_edit_pet);
 
         }
 
         // else the URI is null because the FAB button was pressed and activity is in "new pet mode"
         else {
 
-            //
+            // change action bar title to reflect "new pet mode"
+            setTitle(R.string.editor_activity_title_add_a_pet);
 
         }
 
