@@ -62,7 +62,7 @@ public class CatalogActivity extends AppCompatActivity implements LoaderManager.
         listView.setEmptyView(emptyView);
 
     }
-    
+
     // insert dummy data for a single pet (new row in sqlite table)
     private void insertPet() {
 

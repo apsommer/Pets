@@ -94,7 +94,10 @@ public class PetProvider extends ContentProvider {
                 throw new IllegalArgumentException("Cannot query unknown URI: " + uri);
         }
 
+        // set a notification for this content URI
+        cursor.setNotificationUri(getContext().getContentResolver(), uri);
         return cursor;
+
     }
 
     // insert new data into provider
@@ -159,6 +162,11 @@ public class PetProvider extends ContentProvider {
             return null;
         }
 
+        // if 1 or more rows of were inserted then notify all listeners to this URI
+        if (newRowId > 0) {
+            getContext().getContentResolver().notifyChange(uri, null);
+        }
+
         // return the new URI with the new ID appended to it
         return ContentUris.withAppendedId(uri, newRowId);
     }
@@ -169,6 +177,9 @@ public class PetProvider extends ContentProvider {
 
         // get pattern match code for URI
         final int match = mUriMatcher.match(uri);
+
+        //
+        getContext().getContentResolver().notifyChange(uri, null);
 
         switch (match) {
 
@@ -195,7 +206,9 @@ public class PetProvider extends ContentProvider {
 
             default:
                 throw new IllegalArgumentException("Update failed for: " + uri);
+
         }
+
     }
 
     // update pet(s) in database with given content values, return integer for number of rows updated
@@ -243,7 +256,15 @@ public class PetProvider extends ContentProvider {
         SQLiteDatabase database = mDbHelper.getWritableDatabase();
 
         // update row(s) in pets table, and get the number of total rows affected
-        return database.update(PetEntry.TABLE_NAME, values, selection, selectionArgs);
+        int rowsUpdated = database.update(PetEntry.TABLE_NAME, values, selection, selectionArgs);
+
+        // if 1 or more rows of have changed then notify all listeners to this URI
+        if (rowsUpdated != 0) {
+            getContext().getContentResolver().notifyChange(uri, null);
+        }
+
+        // return total number of rows updated
+        return rowsUpdated;
 
     }
 
@@ -257,13 +278,17 @@ public class PetProvider extends ContentProvider {
         // get pattern match code for URI
         final int match = mUriMatcher.match(uri);
 
+        // track the number of rows deleted
+        int rowsDeleted;
+
         switch (match) {
 
             // full pets table
             case PETS:
 
                 // delete all rows at the selection and selection arguments
-                return database.delete(PetEntry.TABLE_NAME, selection, selectionArgs);
+                rowsDeleted = database.delete(PetEntry.TABLE_NAME, selection, selectionArgs);
+                break;
 
             // specific row in pets table
             case PET_ID:
@@ -278,11 +303,22 @@ public class PetProvider extends ContentProvider {
                 selectionArgs = new String[] {String.valueOf(ContentUris.parseId(uri))};
 
                 // delete a single row given by the ID in the URI
-                return database.delete(PetEntry.TABLE_NAME, selection, selectionArgs);
+                rowsDeleted = database.delete(PetEntry.TABLE_NAME, selection, selectionArgs);
+                rowsDeleted = database.delete(PetEntry.TABLE_NAME, selection, selectionArgs);
+                break;
 
             default:
-                throw new IllegalArgumentException("Deletion is not supported for " + uri);
+                throw new IllegalArgumentException("Deletion is not supported for: " + uri);
+
         }
+
+        // if 1 or more rows of were deleted then notify all listeners to this URI
+        if (rowsDeleted != 0) {
+            getContext().getContentResolver().notifyChange(uri, null);
+        }
+
+        return rowsDeleted;
+
     }
 
     // get MIMI data type at the content URI
