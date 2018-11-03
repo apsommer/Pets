@@ -153,19 +153,20 @@ public class EditorActivity extends AppCompatActivity {
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu options from the res/menu/menu_editor.xml file.
-        // This adds menu items to the app bar.
+
+        // add options menu to app bar by inflating menu_editor
         getMenuInflater().inflate(R.menu.menu_editor, menu);
         return true;
     }
 
+    // click listener for items in the options menu
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
 
-        // User clicked on a menu option in the app bar overflow menu
+        // get id of selected item
         switch (item.getItemId()) {
 
-            // Respond to a click on the "Save" menu option
+            // menu option "Save"
             case R.id.action_save:
 
                 // insert new pet into sqlite database
@@ -175,20 +176,21 @@ public class EditorActivity extends AppCompatActivity {
                 finish();
                 return true;
 
-            // Respond to a click on the "Delete" menu option
+            // menu option "Delete"
             case R.id.action_delete:
 
-                // Do nothing for now
+                // TODO implement delete functionality
                 return true;
 
-            // Respond to a click on the "Up" arrow button in the app bar
+            // this is the arrow up button in top left of app bar
             case android.R.id.home:
 
-                // Navigate back to parent activity (CatalogActivity)
+                // navigate back to parent catalog activity
                 NavUtils.navigateUpFromSameTask(this);
                 return true;
         }
 
+        // defer to super class for correct data type to return
         return super.onOptionsItemSelected(item);
     }
 
