@@ -1,6 +1,7 @@
 package com.example.android.pets;
 
 import android.content.ContentValues;
+import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.NavUtils;
@@ -39,15 +40,40 @@ public class EditorActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
 
+        // defer to super class constructor for initialization
         super.onCreate(savedInstanceState);
+
+        // set layout to activity_editor
         setContentView(R.layout.activity_editor);
 
-        // get references to all relevant views
+        // get the intent which started this activity, always from catalog activity
+        Intent intent = getIntent();
+
+        // extract the URI included with the intent
+        Uri uri = intent.getData();
+
+        // if the URI exists then the activity is in "edit mode" for a single pet
+        if (uri != null) {
+
+            // change action bar title to reflect "edit mode"
+            setTitle("Edit pet");
+
+        }
+
+        // else the URI is null because the FAB button was pressed and activity is in "new pet mode"
+        else {
+
+            //
+
+        }
+
+        // get references to all relevant views for user input
         mNameEditText = (EditText) findViewById(R.id.edit_pet_name);
         mBreedEditText = (EditText) findViewById(R.id.edit_pet_breed);
         mWeightEditText = (EditText) findViewById(R.id.edit_pet_weight);
         mGenderSpinner = (Spinner) findViewById(R.id.spinner_gender);
 
+        // helper function that defines spinner (dropdown menu)
         setupSpinner();
     }
 
@@ -66,6 +92,7 @@ public class EditorActivity extends AppCompatActivity {
 
         // set mGender to the user selected constant value
         mGenderSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
                 String selection = (String) parent.getItemAtPosition(position);
@@ -164,4 +191,5 @@ public class EditorActivity extends AppCompatActivity {
 
         return super.onOptionsItemSelected(item);
     }
+
 }

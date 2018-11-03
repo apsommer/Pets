@@ -1,6 +1,7 @@
 package com.example.android.pets;
 
 import android.app.LoaderManager;
+import android.content.ContentUris;
 import android.content.ContentValues;
 import android.content.Context;
 import android.content.CursorLoader;
@@ -16,6 +17,7 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.AdapterView;
 import android.widget.ListView;
 import android.widget.TextView;
 
@@ -32,19 +34,26 @@ public class CatalogActivity extends AppCompatActivity implements LoaderManager.
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+
+        // defer to superclass constructor for initialization
         super.onCreate(savedInstanceState);
+
+        // set the view as activity_catalog
         setContentView(R.layout.activity_catalog);
 
         // setup FAB to open EditorActivity
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
+
             @Override
             public void onClick(View view) {
 
                 // explicit intent to open editor activity
                 Intent intent = new Intent(CatalogActivity.this, EditorActivity.class);
                 startActivity(intent);
+
             }
+
         });
 
         getLoaderManager().initLoader(PET_LOADER, null, this);
@@ -52,14 +61,36 @@ public class CatalogActivity extends AppCompatActivity implements LoaderManager.
         // get reference to list view in activity_catalog
         ListView listView = (ListView) findViewById(R.id.list_view);
 
+        // get view reference for empty state and set it on the list view
+        View emptyView = findViewById(R.id.empty_view);
+        listView.setEmptyView(emptyView);
+
         // create new cursor adapter and set it on the list view
-        // the cursor input parameter is null because the loader supplies cursors to the adapter
+        // the cursor input parameter is null because a loader supplies cursors to the adapter
         mAdapter = new PetCursorAdapter(this, null);
         listView.setAdapter(mAdapter);
 
-        // get reference and set an empty state for the list view
-        View emptyView = findViewById(R.id.empty_view);
-        listView.setEmptyView(emptyView);
+        // setup click listener for items in the list view
+        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+
+            // clicking an item in the list view opens the editor activity in "edit mode" for that pet
+            @Override
+            public void onItemClick(AdapterView<?> adapterView, View view, int position, long id) {
+
+                // explicit intent to open editor activity
+                Intent intent = new Intent(CatalogActivity.this, EditorActivity.class);
+
+                // add content URI for the selected pet to the intent
+                Uri selectedPetURI = ContentUris.withAppendedId(PetEntry.CONTENT_URI, id);
+                intent.setData(selectedPetURI);
+
+                // start editor activity in "edit mode"
+                startActivity(intent);
+
+            }
+
+        });
+
 
     }
 
