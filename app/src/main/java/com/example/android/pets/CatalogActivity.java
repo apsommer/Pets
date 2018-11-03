@@ -67,42 +67,10 @@ public class CatalogActivity extends AppCompatActivity {
         PetCursorAdapter adapter = new PetCursorAdapter(this, cursor);
         listView.setAdapter(adapter);
 
-//        // try-finally block ensures that the cursor is always closed
-//        try {
-//
-//            // display the number of rows in the Cursor (= number of rows in pets table)
-//            displayView.setText("The pets table contains " + cursor.getCount() + " pets.\n\n");
-//            displayView.append(PetEntry._ID + " - " + PetEntry.COLUMN_PETS_NAME +
-//                    " - " + PetEntry.COLUMN_PETS_BREED + " - " + PetEntry.COLUMN_PETS_GENDER +
-//                    " - " + PetEntry.COLUMN_PETS_WEIGHT + "\n");
-//
-//            // get index position (int) for each column
-//            int idColumnIndex = cursor.getColumnIndex(PetEntry._ID);
-//            int nameColumnIndex = cursor.getColumnIndex(PetEntry.COLUMN_PETS_NAME);
-//            int breedColumnIndex = cursor.getColumnIndex(PetEntry.COLUMN_PETS_BREED);
-//            int genderColumnIndex = cursor.getColumnIndex(PetEntry.COLUMN_PETS_GENDER);
-//            int weightColumnIndex = cursor.getColumnIndex(PetEntry.COLUMN_PETS_WEIGHT);
-//
-//            // iterate through all rows, Cursor starts at row -1 (column titles)
-//            // therefore, first moveToNext() puts Cursor at row 0
-//            while (cursor.moveToNext()) {
-//
-//                // use indices to extract table values
-//                int currentID = cursor.getInt(idColumnIndex);
-//                String currentName = cursor.getString(nameColumnIndex);
-//                String currentBreed = cursor.getString(breedColumnIndex);
-//                int currentGender = cursor.getInt(genderColumnIndex);
-//                int currentWeight = cursor.getInt(weightColumnIndex);
-//
-//                displayView.append("\n" + currentID + " - " + currentName + " - " + currentBreed
-//                    + " - " + currentGender + " - " + currentWeight);
-//
-//            }
-//
-//        // always close Cursor to prevent memory leaks
-//        } finally {
-//            cursor.close();
-//        }
+        // get reference and set an empty state for the list view
+        View emptyView = findViewById(R.id.empty_view);
+        listView.setEmptyView(emptyView);
+
     }
 
     // insert dummy data for a single pet (new row in sqlite table)
