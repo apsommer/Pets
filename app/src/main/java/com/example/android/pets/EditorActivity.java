@@ -43,10 +43,7 @@ public class EditorActivity extends AppCompatActivity implements LoaderManager.L
     private static final int PET_LOADER = 0;
 
     // gender of the pet: 0 for unknown gender, 1 for male, 2 for female
-    private int mGender = 0;
-
-    // integer id of pet in pets table
-    long mId;
+    private int mGender = PetEntry.GENDER_UNKNOWN;
 
     // content URI for the selected existing pet, null if new pet
     private Uri mSelectedPetURI;
@@ -66,24 +63,19 @@ public class EditorActivity extends AppCompatActivity implements LoaderManager.L
         // extract the URI included with the intent
         mSelectedPetURI = intent.getData();
 
-        // if the URI exists then the activity is in "edit mode" for a single pet
-        if (mSelectedPetURI != null) {
+        // update app bar title
+        // if the URI is null, the FAB button was pressed and the activity is in "insert mode"
+        if (mSelectedPetURI == null) {
+            setTitle(R.string.editor_activity_title_add_a_pet);
+        }
 
-            // change action bar title to reflect "edit mode"
+        // else the URI exists, and the activity is in "edit mode" for an existing single pet
+        else {
             setTitle(R.string.editor_activity_title_edit_pet);
 
+            // initialize loader
+            getLoaderManager().initLoader(PET_LOADER, null, this);
         }
-
-        // else the URI is null because the FAB button was pressed and activity is in "new pet mode"
-        else {
-
-            // change action bar title to reflect "new pet mode"
-            setTitle(R.string.editor_activity_title_add_a_pet);
-
-        }
-
-        // initialize loader
-        getLoaderManager().initLoader(PET_LOADER, null, this);
 
         // get references to all relevant views for user input
         mNameEditText = (EditText) findViewById(R.id.edit_pet_name);
@@ -93,6 +85,7 @@ public class EditorActivity extends AppCompatActivity implements LoaderManager.L
 
         // helper function that defines spinner (dropdown menu)
         setupSpinner();
+
     }
 
     // setup the dropdown spinner to allow user to select the pet gender
@@ -133,12 +126,14 @@ public class EditorActivity extends AppCompatActivity implements LoaderManager.L
         });
     }
 
-    private void insertPet() {
+    private void savePet() {
+
+        String toastMessage;
 
         // get user selections
         String nameString = mNameEditText.getText().toString().trim();
         String breedString = mBreedEditText.getText().toString().trim();
-        // gender is already an int, assigned in the spinner listener
+        // mGender is already an int, assigned in the spinner listener
         int weightInt = Integer.parseInt(mWeightEditText.getText().toString().trim());
 
         // container for key : value pairs
@@ -150,17 +145,38 @@ public class EditorActivity extends AppCompatActivity implements LoaderManager.L
         values.put(PetEntry.COLUMN_PETS_GENDER, mGender);
         values.put(PetEntry.COLUMN_PETS_WEIGHT, weightInt);
 
-        // perform an insert on the provider using a content resolver
-        // the correct content URI is defined as a constant in PetContract
-        Uri uri = getContentResolver().insert(PetEntry.CONTENT_URI, values);
+        // if the URI is null, the FAB button was pressed and the activity is in "insert mode"
+        if (mSelectedPetURI == null) {
 
-        // toast message about status of row insert
-        String toastMessage;
-        if (uri == null) { // row insert failed and therefore returned insert uri is null
-            toastMessage = getString(R.string.pet_saved_error);
+            // perform an insert on the provider using a content resolver
+            // the correct content URI is defined as a constant in PetContract
+            Uri newPetURI = getContentResolver().insert(PetEntry.CONTENT_URI, values);
+
+            // toast message about status of row insert
+            if (newPetURI == null) { // row insert failed and therefore returned insert uri is null
+                toastMessage = getString(R.string.pet_saved_error);
+            }
+            else { // row insert successful
+                toastMessage = getString(R.string.pet_saved);
+            }
+
         }
-        else { // row insert successful
-            toastMessage = getString(R.string.pet_saved);
+
+        // if the URI exists, then the activity is in "edit mode" for an existing single pet
+        else {
+
+            // perform an insert on the provider using a content resolver
+            // the correct content URI is defined as a constant in PetContract
+            int updatedRow = getContentResolver().update(mSelectedPetURI, values, null, null);
+
+            // toast message about status of row insert
+            if (updatedRow == 0) {
+                toastMessage = getString(R.string.pet_saved_error);
+            }
+            else { // row insert successful
+                toastMessage = getString(R.string.pet_saved);
+            }
+
         }
 
         // display toast
@@ -187,8 +203,8 @@ public class EditorActivity extends AppCompatActivity implements LoaderManager.L
             // menu option "Save"
             case R.id.action_save:
 
-                // insert new pet into sqlite database
-                insertPet();
+                // save existing pet data in sqlite database
+                savePet();
 
                 // exit activity and return to catalog activity
                 finish();
