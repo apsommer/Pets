@@ -1,7 +1,7 @@
 package com.example.android.pets;
 
+// framework packages
 import android.app.LoaderManager;
-import android.content.ContentUris;
 import android.content.ContentValues;
 import android.content.CursorLoader;
 import android.content.Intent;
@@ -12,7 +12,6 @@ import android.os.Bundle;
 import android.support.v4.app.NavUtils;
 import android.support.v7.app.AppCompatActivity;
 import android.text.TextUtils;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -21,7 +20,9 @@ import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.Spinner;
 import android.widget.Toast;
+import java.util.Locale;
 
+// native packages
 import com.example.android.pets.data.PetContract.PetEntry;
 
 // user creates a new pet or edits an existing one
@@ -128,13 +129,29 @@ public class EditorActivity extends AppCompatActivity implements LoaderManager.L
 
     private void savePet() {
 
-        String toastMessage;
-
-        // get user selections
+        // get raw state of user fields as strings
         String nameString = mNameEditText.getText().toString().trim();
         String breedString = mBreedEditText.getText().toString().trim();
-        // mGender is already an int, assigned in the spinner listener
-        int weightInt = Integer.parseInt(mWeightEditText.getText().toString().trim());
+        // mGender is assigned with the spinner selection, starting at default PetEntry.GENDER_UNKNOWN
+        String weightString = mWeightEditText.getText().toString().trim();
+
+        // if all fields are blank assume the user made a mistake and exit without saving
+        if (TextUtils.isEmpty(nameString) && TextUtils.isEmpty(breedString) &&
+                mGender == PetEntry.GENDER_UNKNOWN && TextUtils.isEmpty(weightString)) {
+            return;
+        }
+
+        // weight is a numerical value
+        int weightInt;
+
+        // if the user leaves the weight field blank then assign a default weight of 0
+        if (TextUtils.isEmpty(weightString)) {
+            weightInt = 0;
+
+        // otherwise the user has specified a weight value
+        } else {
+            weightInt = Integer.parseInt(weightString);
+        }
 
         // container for key : value pairs
         ContentValues values = new ContentValues();
@@ -145,41 +162,42 @@ public class EditorActivity extends AppCompatActivity implements LoaderManager.L
         values.put(PetEntry.COLUMN_PETS_GENDER, mGender);
         values.put(PetEntry.COLUMN_PETS_WEIGHT, weightInt);
 
+        // toast to display success (or failure) of save action
+        String toastMessage;
+
         // if the URI is null, the FAB button was pressed and the activity is in "insert mode"
         if (mSelectedPetURI == null) {
 
             // perform an insert on the provider using a content resolver
-            // the correct content URI is defined as a constant in PetContract
             Uri newPetURI = getContentResolver().insert(PetEntry.CONTENT_URI, values);
 
-            // toast message about status of row insert
-            if (newPetURI == null) { // row insert failed and therefore returned insert uri is null
+            // row insert failed and therefore returned insert uri is null
+            if (newPetURI == null) {
                 toastMessage = getString(R.string.pet_saved_error);
-            }
-            else { // row insert successful
+
+            // row insert successful
+            } else {
                 toastMessage = getString(R.string.pet_saved);
             }
-
-        }
 
         // if the URI exists, then the activity is in "edit mode" for an existing single pet
-        else {
+        } else {
 
             // perform an insert on the provider using a content resolver
-            // the correct content URI is defined as a constant in PetContract
             int updatedRow = getContentResolver().update(mSelectedPetURI, values, null, null);
 
-            // toast message about status of row insert
+            // row insert failed and therefore the number of affected rows is zero
             if (updatedRow == 0) {
                 toastMessage = getString(R.string.pet_saved_error);
-            }
-            else { // row insert successful
+
+            // row insert successful
+            } else {
                 toastMessage = getString(R.string.pet_saved);
             }
 
         }
 
-        // display toast
+        // display toast message
         Toast toast = Toast.makeText(getApplicationContext(), toastMessage, Toast.LENGTH_SHORT);
         toast.show();
 
@@ -266,7 +284,7 @@ public class EditorActivity extends AppCompatActivity implements LoaderManager.L
             // set the proper values in each user input field
             mNameEditText.setText(name);
             mBreedEditText.setText(breed);
-            mWeightEditText.setText(Integer.toString(weight));
+            mWeightEditText.setText(String.format(Locale.getDefault(), "%d", weight));
             mGenderSpinner.setSelection(gender);
 
         }
