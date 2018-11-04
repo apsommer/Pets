@@ -56,6 +56,7 @@ public class CatalogActivity extends AppCompatActivity implements LoaderManager.
 
         });
 
+        // initialize loader
         getLoaderManager().initLoader(PET_LOADER, null, this);
 
         // get reference to list view in activity_catalog
