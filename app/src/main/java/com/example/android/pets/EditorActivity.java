@@ -125,7 +125,7 @@ public class EditorActivity extends AppCompatActivity implements LoaderManager.L
         // negative button means cancel the navigation attempt and stay in the editor activity
         builder.setNegativeButton(R.string.keep_editing, new DialogInterface.OnClickListener() {
 
-            // in-line definition as this is a catch-all simple case
+            // return back to editor activity
             @Override
             public void onClick(DialogInterface dialog, int i) {
                 if (dialog != null) {
@@ -139,6 +139,31 @@ public class EditorActivity extends AppCompatActivity implements LoaderManager.L
         alertDialog.show();
 
     }
+
+    // if the user presses the back button with unsaved changes a warning dialog box appears
+    @Override
+    public void onBackPressed() {
+
+        // if the user has not entered anything then proceed with normal back button behavior
+        if (!mPetHasChanged) {
+            super.onBackPressed();
+        }
+
+        // define a click listener for the "discard changes" button
+        // this ends the editor activity
+        DialogInterface.OnClickListener discardButtonClickListener = new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int i) {
+                finish();
+            }
+        };
+
+        // pass the discard button click listener to the alert dialog helper method
+        showUnsavedChangesDialog(discardButtonClickListener);
+
+    }
+
+
 
     // setup the dropdown spinner to allow user to select the pet gender
     private void setupSpinner() {
@@ -281,12 +306,29 @@ public class EditorActivity extends AppCompatActivity implements LoaderManager.L
                 // TODO implement delete functionality
                 return true;
 
-            // this is the arrow up button in top left of app bar
+            // this is the up arrow button in top left of app bar
+            // the first word in the signature android. means this is a framework component
             case android.R.id.home:
 
-                // navigate back to parent catalog activity
-                NavUtils.navigateUpFromSameTask(this);
+                // if the user has not entered anything then proceed with normal up button behavior
+                if (!mPetHasChanged) {
+                    NavUtils.navigateUpFromSameTask(this);
+                    return true;
+                }
+
+                // define a click listener for the "discard changes" button
+                // this ends the editor activity
+                DialogInterface.OnClickListener discardButtonClickListener = new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int i) {
+                        NavUtils.navigateUpFromSameTask(EditorActivity.this);
+                    }
+                };
+
+                // pass the discard button click listener to the alert dialog helper method
+                showUnsavedChangesDialog(discardButtonClickListener);
                 return true;
+
         }
 
         // defer to super class for correct data type to return
