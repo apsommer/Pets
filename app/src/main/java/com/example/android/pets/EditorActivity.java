@@ -79,14 +79,20 @@ public class EditorActivity extends AppCompatActivity implements LoaderManager.L
         // extract the URI included with the intent
         mSelectedPetURI = intent.getData();
 
-        // update app bar title
         // if the URI is null, the FAB button was pressed and the activity is in "insert mode"
         if (mSelectedPetURI == null) {
+
+            // update app bar title
             setTitle(R.string.editor_activity_title_add_a_pet);
-        }
+
+            // since a pet is being added, the option to delete should be hidden from the menu
+            // this invalidation causes the system to call onPrepareOptionsMenu
+            invalidateOptionsMenu();
 
         // else the URI exists, and the activity is in "edit mode" for an existing single pet
-        else {
+        } else {
+
+            // update app bar title
             setTitle(R.string.editor_activity_title_edit_pet);
 
             // initialize loader
@@ -108,6 +114,22 @@ public class EditorActivity extends AppCompatActivity implements LoaderManager.L
         // helper function that defines spinner (dropdown menu)
         setupSpinner();
 
+    }
+
+    // called by the system when in "insert pet" mode to hide the delete option from the overflow menu
+    @Override
+    public boolean onPrepareOptionsMenu(Menu menu) {
+
+        // defer to super class for initialization
+        super.onPrepareOptionsMenu(menu);
+
+        // hide the option to delete
+        if (mSelectedPetURI == null) {
+            MenuItem menuItem = menu.findItem(R.id.action_delete);
+            menuItem.setVisible(false);
+        }
+
+        return true;
     }
 
     // create and show the "unsaved changes" dialog box
