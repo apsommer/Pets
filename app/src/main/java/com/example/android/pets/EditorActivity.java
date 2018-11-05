@@ -1,9 +1,11 @@
 package com.example.android.pets;
 
 // framework packages
+import android.app.AlertDialog;
 import android.app.LoaderManager;
 import android.content.ContentValues;
 import android.content.CursorLoader;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.Loader;
 import android.database.Cursor;
@@ -14,6 +16,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.text.TextUtils;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.MotionEvent;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
@@ -48,6 +51,18 @@ public class EditorActivity extends AppCompatActivity implements LoaderManager.L
 
     // content URI for the selected existing pet, null if new pet
     private Uri mSelectedPetURI;
+
+    // flag for unsaved user changes when navigating away from activity
+    private boolean mPetHasChanged;
+
+    // touch listener is set on a view, a touch implies the field has changed
+    private View.OnTouchListener mTouchListener = new View.OnTouchListener() {
+        @Override
+        public boolean onTouch(View view, MotionEvent motionEvent) {
+            mPetHasChanged = true;
+            return false;
+        }
+    };
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -84,8 +99,44 @@ public class EditorActivity extends AppCompatActivity implements LoaderManager.L
         mWeightEditText = (EditText) findViewById(R.id.edit_pet_weight);
         mGenderSpinner = (Spinner) findViewById(R.id.spinner_gender);
 
+        // set a listener on each user input field
+        mNameEditText.setOnTouchListener(mTouchListener);
+        mBreedEditText.setOnTouchListener(mTouchListener);
+        mGenderSpinner.setOnTouchListener(mTouchListener);
+        mWeightEditText.setOnTouchListener(mTouchListener);
+
         // helper function that defines spinner (dropdown menu)
         setupSpinner();
+
+    }
+
+    // create and show the "unsaved changes" dialog box
+    private void showUnsavedChangesDialog(DialogInterface.OnClickListener discardButtonClickListener) {
+
+        // alert dialog builder constructs the attributes of the message box
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+
+        // primary message title
+        builder.setMessage(R.string.unsaved_changes_dialog_msg);
+
+        // positive button means to ignore the unsaved changes and continue with navigation
+        builder.setPositiveButton(R.string.discard_changes, discardButtonClickListener);
+
+        // negative button means cancel the navigation attempt and stay in the editor activity
+        builder.setNegativeButton(R.string.keep_editing, new DialogInterface.OnClickListener() {
+
+            // in-line definition as this is a catch-all simple case
+            @Override
+            public void onClick(DialogInterface dialog, int i) {
+                if (dialog != null) {
+                    dialog.dismiss();
+                }
+            }
+        });
+
+        // create and show the constructed dialog box
+        AlertDialog alertDialog = builder.create();
+        alertDialog.show();
 
     }
 
@@ -141,15 +192,11 @@ public class EditorActivity extends AppCompatActivity implements LoaderManager.L
             return;
         }
 
-        // weight is a numerical value
-        int weightInt;
+        // if the user leaves the weight field blank use a default value of 0
+        int weightInt = 0;
 
-        // if the user leaves the weight field blank then assign a default weight of 0
-        if (TextUtils.isEmpty(weightString)) {
-            weightInt = 0;
-
-        // otherwise the user has specified a weight value
-        } else {
+        // under normal conditions the user specifies a weight value
+        if (!TextUtils.isEmpty(weightString)) {
             weightInt = Integer.parseInt(weightString);
         }
 
