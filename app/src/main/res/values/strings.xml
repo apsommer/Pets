@@ -79,7 +79,10 @@
     <string name="editor_delete_pet_failed">Error with deleting pet</string>
 
     <!-- Dialog message to ask the user to confirm deleting the current pet [CHAR LIMIT=NONE] -->
-    <string name="delete_dialog_msg">Delete this pet?</string>
+    <string name="delete_dialog_msg_single_pet">Delete this pet?</string>
+
+    <!-- Dialog message to ask the user to confirm deleting the current pet [CHAR LIMIT=NONE] -->
+    <string name="delete_dialog_msg_all_pets">Delete all pets?</string>
 
     <!-- Dialog button text for the option to confirm deleting the current pet [CHAR LIMIT=20] -->
     <string name="delete">Delete</string>

@@ -169,7 +169,7 @@ public class EditorActivity extends AppCompatActivity implements LoaderManager.L
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
 
         // primary message title
-        builder.setMessage(R.string.delete_dialog_msg);
+        builder.setMessage(R.string.delete_dialog_msg_single_pet);
 
         // positive button is a confirmation to delete the pet from the database
         builder.setPositiveButton(R.string.delete, new DialogInterface.OnClickListener() {
@@ -201,32 +201,18 @@ public class EditorActivity extends AppCompatActivity implements LoaderManager.L
     // helper method called when delete button is pressed in the delete confirmation dialog
     private void deletePet() {
 
-        // toast to display success (or failure) of delete action
-        String toastMessage;
-
-        // if the URI is null, the FAB button was pressed and the activity is in "insert mode"
-        if (mSelectedPetURI == null) {
-
-//            // perform an insert on the provider using a content resolver
-//            Uri newPetURI = getContentResolver().insert(PetEntry.CONTENT_URI, values);
-//
-//            // row insert failed and therefore returned insert uri is null
-//            if (newPetURI == null) {
-//                toastMessage = getString(R.string.pet_saved_error);
-//
-//                // row insert successful
-//            } else {
-                toastMessage = getString(R.string.pet_saved);
-//            }
-
         // if the URI exists, then the activity is in "edit mode" for an existing single pet
-        } else {
+        // if the URI is null, the FAB button was pressed and the activity is in "insert mode"
+        if (mSelectedPetURI != null) {
 
             // perform a delete on the provider using a content resolver
-            int deletedRow = getContentResolver().delete(mSelectedPetURI, null, null);
+            int deletedRows = getContentResolver().delete(mSelectedPetURI, null, null);
+
+            // toast to display success (or failure) of delete action
+            String toastMessage;
 
             // row delete failed and therefore the number of deleted rows is zero
-            if (deletedRow == 0) {
+            if (deletedRows == 0) {
                 toastMessage = getString(R.string.editor_delete_pet_failed);
 
             // row delete successful
@@ -234,11 +220,14 @@ public class EditorActivity extends AppCompatActivity implements LoaderManager.L
                 toastMessage = getString(R.string.editor_delete_pet_successful);
             }
 
+            // display toast message
+            Toast toast = Toast.makeText(getApplicationContext(), toastMessage, Toast.LENGTH_SHORT);
+            toast.show();
+
         }
 
-        // display toast message
-        Toast toast = Toast.makeText(getApplicationContext(), toastMessage, Toast.LENGTH_SHORT);
-        toast.show();
+        // exit activity and return to catalog activity
+        finish();
 
     }
 
@@ -407,9 +396,6 @@ public class EditorActivity extends AppCompatActivity implements LoaderManager.L
 
                 // ask the user for confirmation using a dialog box
                 showDeleteConfirmationDialog();
-
-                // exit activity and return to catalog activity
-                finish();
                 return true;
 
             // this is the up arrow button in top left of app bar

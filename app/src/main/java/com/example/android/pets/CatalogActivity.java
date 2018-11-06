@@ -1,10 +1,12 @@
 package com.example.android.pets;
 
+import android.app.AlertDialog;
 import android.app.LoaderManager;
 import android.content.ContentUris;
 import android.content.ContentValues;
 import android.content.Context;
 import android.content.CursorLoader;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.Loader;
 import android.database.Cursor;
@@ -20,6 +22,7 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.example.android.pets.data.PetContract.PetEntry;
 
@@ -136,11 +139,71 @@ public class CatalogActivity extends AppCompatActivity implements LoaderManager.
             // Respond to a click on the "Delete all entries" menu option
             case R.id.action_delete_all_entries:
 
-                // Do nothing for now
+                showDeleteConfirmationDialog();
                 return true;
         }
 
         return super.onOptionsItemSelected(item);
+    }
+
+    // create and show the "delete confirmation" dialog box
+    private void showDeleteConfirmationDialog() {
+
+        // alert dialog builder constructs the attributes of the message box
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+
+        // primary message title
+        builder.setMessage(R.string.delete_dialog_msg_all_pets);
+
+        // positive button is a confirmation to delete all pets from the database
+        builder.setPositiveButton(R.string.delete, new DialogInterface.OnClickListener() {
+
+            // call helper method to perform the delete
+            @Override
+            public void onClick(DialogInterface dialog, int i) {
+                deleteAllPets();
+            }
+        });
+
+        // negative button means cancel the navigation attempt and stay in the editor activity
+        builder.setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
+
+            // return back to editor activity
+            @Override
+            public void onClick(DialogInterface dialog, int i) {
+                if (dialog != null) {
+                    dialog.dismiss();
+                }
+            }
+        });
+
+        // create and show the constructed dialog box
+        AlertDialog alertDialog = builder.create();
+        alertDialog.show();
+    }
+
+    // helper method called when delete button is pressed in the delete confirmation dialog
+    private void deleteAllPets() {
+
+        // perform a delete on the provider using a content resolver
+        int deletedRows = getContentResolver().delete(PetEntry.CONTENT_URI, null, null);
+
+        // toast to display success (or failure) of delete action
+        String toastMessage;
+
+        // row delete failed and therefore the number of deleted rows is zero
+        if (deletedRows == 0) {
+            toastMessage = getString(R.string.editor_delete_pet_failed);
+
+            // row delete successful
+        } else {
+            toastMessage = getString(R.string.editor_delete_pet_successful);
+        }
+
+        // display toast message
+        Toast toast = Toast.makeText(getApplicationContext(), toastMessage, Toast.LENGTH_SHORT);
+        toast.show();
+
     }
 
     @Override
