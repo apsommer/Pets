@@ -304,7 +304,6 @@ public class PetProvider extends ContentProvider {
 
                 // delete a single row given by the ID in the URI
                 rowsDeleted = database.delete(PetEntry.TABLE_NAME, selection, selectionArgs);
-                rowsDeleted = database.delete(PetEntry.TABLE_NAME, selection, selectionArgs);
                 break;
 
             default:

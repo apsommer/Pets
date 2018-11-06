@@ -162,6 +162,86 @@ public class EditorActivity extends AppCompatActivity implements LoaderManager.L
 
     }
 
+    // create and show the "delete confirmation" dialog box
+    private void showDeleteConfirmationDialog() {
+
+        // alert dialog builder constructs the attributes of the message box
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+
+        // primary message title
+        builder.setMessage(R.string.delete_dialog_msg);
+
+        // positive button is a confirmation to delete the pet from the database
+        builder.setPositiveButton(R.string.delete, new DialogInterface.OnClickListener() {
+
+            // call helper method to perform the delete
+            @Override
+            public void onClick(DialogInterface dialog, int i) {
+                deletePet();
+            }
+        });
+
+        // negative button means cancel the navigation attempt and stay in the editor activity
+        builder.setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
+
+            // return back to editor activity
+            @Override
+            public void onClick(DialogInterface dialog, int i) {
+                if (dialog != null) {
+                    dialog.dismiss();
+                }
+            }
+        });
+
+        // create and show the constructed dialog box
+        AlertDialog alertDialog = builder.create();
+        alertDialog.show();
+    }
+
+    // helper method called when delete button is pressed in the delete confirmation dialog
+    private void deletePet() {
+
+        // toast to display success (or failure) of delete action
+        String toastMessage;
+
+        // if the URI is null, the FAB button was pressed and the activity is in "insert mode"
+        if (mSelectedPetURI == null) {
+
+//            // perform an insert on the provider using a content resolver
+//            Uri newPetURI = getContentResolver().insert(PetEntry.CONTENT_URI, values);
+//
+//            // row insert failed and therefore returned insert uri is null
+//            if (newPetURI == null) {
+//                toastMessage = getString(R.string.pet_saved_error);
+//
+//                // row insert successful
+//            } else {
+                toastMessage = getString(R.string.pet_saved);
+//            }
+
+        // if the URI exists, then the activity is in "edit mode" for an existing single pet
+        } else {
+
+            // perform a delete on the provider using a content resolver
+            int deletedRow = getContentResolver().delete(mSelectedPetURI, null, null);
+
+            // row delete failed and therefore the number of deleted rows is zero
+            if (deletedRow == 0) {
+                toastMessage = getString(R.string.editor_delete_pet_failed);
+
+            // row delete successful
+            } else {
+                toastMessage = getString(R.string.editor_delete_pet_successful);
+            }
+
+        }
+
+        // display toast message
+        Toast toast = Toast.makeText(getApplicationContext(), toastMessage, Toast.LENGTH_SHORT);
+        toast.show();
+
+    }
+
     // if the user presses the back button with unsaved changes a warning dialog box appears
     @Override
     public void onBackPressed() {
@@ -325,7 +405,11 @@ public class EditorActivity extends AppCompatActivity implements LoaderManager.L
             // menu option "Delete"
             case R.id.action_delete:
 
-                // TODO implement delete functionality
+                // ask the user for confirmation using a dialog box
+                showDeleteConfirmationDialog();
+
+                // exit activity and return to catalog activity
+                finish();
                 return true;
 
             // this is the up arrow button in top left of app bar
