@@ -217,7 +217,7 @@ public class CatalogActivity extends AppCompatActivity implements LoaderManager.
 
     }
 
-    // called by system when a new cursor si finished being created by the loader
+    // called by system when a new cursor is finished being created by the loader
     // the adapter must now refresh with this new cursor
     @Override
     public void onLoadFinished(Loader<Cursor> loader, Cursor cursor) {

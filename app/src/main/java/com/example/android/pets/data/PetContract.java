@@ -46,6 +46,7 @@ public final class PetContract {
         }
 
         // content URI for the pets table
+        // equivalent to "content://com.example.android.pets/pets"
         public static final Uri CONTENT_URI = Uri.withAppendedPath(BASE_CONTENT_URI, PATH_PETS);
 
         // MIME type for a list of pets
