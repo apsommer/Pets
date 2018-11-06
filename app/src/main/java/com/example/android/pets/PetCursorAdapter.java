@@ -15,7 +15,7 @@ import com.example.android.pets.data.PetContract.PetEntry;
 public class PetCursorAdapter extends CursorAdapter {
 
     // defer to super class constructor for initialization
-    public PetCursorAdapter(Context context, Cursor c) {
+    PetCursorAdapter(Context context, Cursor c) {
         super(context, c, 0);
     }
 
