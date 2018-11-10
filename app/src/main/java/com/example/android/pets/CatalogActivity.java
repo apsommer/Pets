@@ -114,8 +114,7 @@ public class CatalogActivity extends AppCompatActivity implements LoaderManager.
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
 
-        // Inflate the menu options from the res/menu/menu_catalog.xml file.
-        // This adds menu items to the app bar.
+        // inflate the menu options from layout menu_catalog
         getMenuInflater().inflate(R.menu.menu_catalog, menu);
         return true;
     }
@@ -164,7 +163,7 @@ public class CatalogActivity extends AppCompatActivity implements LoaderManager.
         // negative button means cancel the navigation attempt and stay in the editor activity
         builder.setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
 
-            // return back to editor activity
+            // return back to activity
             @Override
             public void onClick(DialogInterface dialog, int i) {
                 if (dialog != null) {
@@ -213,15 +212,15 @@ public class CatalogActivity extends AppCompatActivity implements LoaderManager.
 
     }
 
-    // called by system when a new cursor is finished being created by the loader
-    // the adapter must now refresh with this new cursor
+    // called by the system when a new cursor is finished being created by the loader
+    // refresh the adapter with this new cursor
     @Override
     public void onLoadFinished(Loader<Cursor> loader, Cursor cursor) {
         mAdapter.swapCursor(cursor);
     }
 
     // called when a previously created loader is being reset
-    // therefore its data is no longer valid and the cursor currently in the adapter is removed
+    // therefore the cursor data is no longer valid and the adapter is cleared
     @Override
     public void onLoaderReset(Loader<Cursor> loader) {
         mAdapter.swapCursor(null);

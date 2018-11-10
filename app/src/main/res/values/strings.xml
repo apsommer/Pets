@@ -53,11 +53,11 @@
     <string name="pet_saved">Pet saved</string>
     <string name="pet_saved_error">Error saving pet</string>
 
-    <!-- Title text for the empty view, which describes the empty dog house image [CHAR LIMIT=50] -->
+    <!-- Title text for the empty view, which describes the empty bookshelf image [CHAR LIMIT=50] -->
     <string name="empty_view_title_text">It\'s a bit lonely here...</string>
 
     <!-- Subtitle text for the empty view that prompts the user to add a pet [CHAR LIMIT=50] -->
-    <string name="empty_view_subtitle_text">Get started by adding a pet</string>
+    <string name="empty_view_subtitle_text">Get started by adding a book</string>
 
     <!-- App bar titles for two different modes of editor activity [CHAR LIMIT=20] -->
     <string name="editor_activity_title_edit_pet">Edit pet</string>
@@ -81,14 +81,16 @@
     <!-- Dialog message to ask the user to confirm deleting the current pet [CHAR LIMIT=NONE] -->
     <string name="delete_dialog_msg_single_pet">Delete this pet?</string>
 
-    <!-- Dialog message to ask the user to confirm deleting the current pet [CHAR LIMIT=NONE] -->
+    <!-- Dialog message asking the user to confirm deleting all pets [CHAR LIMIT=NONE] -->
     <string name="delete_dialog_msg_all_pets">Delete all pets?</string>
 
-    <!-- Dialog button text for the option to confirm deleting the current pet [CHAR LIMIT=20] -->
+    <!-- Dialog button text for the option to confirm delete [CHAR LIMIT=20] -->
     <string name="delete">Delete</string>
 
-    <!-- Dialog button text for the option to cancel deletion of the current pet [CHAR LIMIT=20] -->
+    <!-- Dialog button text for the option to cancel deletion [CHAR LIMIT=20] -->
     <string name="cancel">Cancel</string>
+
+    <!-- Label for list item if the breed is not specified -->
     <string name="unknown_breed">Unknown breed</string>
 
 </resources>

@@ -366,6 +366,7 @@ public class EditorActivity extends AppCompatActivity implements LoaderManager.L
 
     }
 
+    // overflow menu
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
 
@@ -384,7 +385,7 @@ public class EditorActivity extends AppCompatActivity implements LoaderManager.L
             // menu option "Save"
             case R.id.action_save:
 
-                // save existing pet data in sqlite database
+                // helper method to save existing pet data in sqlite database
                 savePet();
 
                 // exit activity and return to catalog activity
@@ -399,7 +400,7 @@ public class EditorActivity extends AppCompatActivity implements LoaderManager.L
                 return true;
 
             // this is the up arrow button in top left of app bar
-            // the first word in the signature android. means this is a framework component
+            // the first part of the signature "android." means this is a framework component
             case android.R.id.home:
 
                 // if the user has not entered anything then proceed with normal up button behavior
